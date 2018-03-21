@@ -1,4 +1,4 @@
-# Copyright 2012 Nebula, Inc.
+# Copyright 2013 Hewlett-Packard Development Company, L.P.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,18 +12,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.utils.translation import ugettext_lazy as _
-from monitoring.config import local_settings as settings
+from django.utils.translation import ugettext_lazy as _  # noqa
 
 import horizon
 
+from monitoring import dashboard
 
-class Monitoring(horizon.Dashboard):
-    name = _("Monitoring")
-    slug = "monitoring"
-    panels = ('overview', 'alarmdefs', 'alarms', 'raised_alarms', 'notifications',)
-    default_panel = 'overview'
-    policy_rules = (("monitoring", "monitoring:monitoring"),)
-    permissions = (('openstack.services.' + settings.MONITORING_SERVICE_TYPE),)
 
-horizon.register(Monitoring)
+class RaisedAlarms(horizon.Panel):
+    name = _("Raised Alarms")
+    slug = 'raised_alarms'
+
+
+dashboard.Monitoring.register(RaisedAlarms)
