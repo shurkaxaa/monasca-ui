@@ -20,6 +20,43 @@ LOG = log.getLogger(__name__)
 
 
 @profiler.trace
+def raised_alarm_list(request, offset=0, limit=10000, marker=None, paginate=False):
+    result = client.monascaclient(request).alarms.list(offset=offset,
+                                                       limit=limit,
+                                                       state='ALARM')
+    return result['elements'] if type(result) is dict else result
+
+
+
+@profiler.trace
+def raised_alarm_list_by_dimension(request, dimensions, offset=0, limit=10000,
+                            marker=None, paginate=False):
+    dim_dict = {}
+    metric = None
+    dimensions = dimensions.split(",")
+    for item in dimensions:
+        if '=' in item:
+            name, value = item.split('=')
+            if name == 'metric':
+                metric = value
+            else:
+                dim_dict[name] = value
+        else:
+            dim_dict[item] = None
+    if metric:
+        result = client.monascaclient(request).alarms.list(offset=offset,
+                                                        limit=limit,
+                                                        metric_dimensions=dim_dict,
+                                                        metric_name=metric,
+                                                        state='ALARM')
+    else:
+        result = client.monascaclient(request).alarms.list(offset=offset,
+                                                        limit=limit,
+                                                        metric_dimensions=dim_dict,
+                                                        state='ALARM')
+    return result['elements'] if type(result) is dict else result
+
+@profiler.trace
 def alarm_list(request, offset=0, limit=10000, marker=None, paginate=False):
     result = client.monascaclient(request).alarms.list(offset=offset,
                                                        limit=limit)
